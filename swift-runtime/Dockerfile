@@ -33,6 +33,7 @@ WORKDIR ${WORK_DIR}
 # Linux OS utils & Swift libraries
 RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y \
   libicu-dev \
+  libgd-dev \
   libcurl4-openssl-dev \
   wget \
   && apt-get clean \
