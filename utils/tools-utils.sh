@@ -35,22 +35,39 @@ function help {
 
 #----------------------------------------------------------
 function debugServer {
-  lldb-server platform --listen *:$DEBUG_PORT --server &
-  echo "Started debug server on port $DEBUG_PORT."
+  # Updating ptrace_scope, requires running container in privilege mode
+  # We should look into creating an apparmor profile at some point...
+  # https://docs.docker.com/engine/security/apparmor/
+  echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+  MIN_SEVER_PORT=$(( DEBUG_PORT + 1 ))
+  MAX_SEVER_PORT=$(( MIN_SEVER_PORT + 1 ))
+  lldb-server platform --port-offset=$DEBUG_PORT --listen *:$DEBUG_PORT --min-gdbserver-port $MIN_SEVER_PORT --max-gdbserver-port $MAX_SEVER_PORT --server &
+  echo "Started debug server on port $DEBUG_PORT (min-gdbserver-port: $MIN_SEVER_PORT, max-gdbserver-port: $MAX_SEVER_PORT)."
 }
 
 #----------------------------------------------------------
 function buildProject {
-
   echo "Compiling the project..."
   echo "Build configuration: $BUILD_CONFIGURATION"
-  swift build --configuration $BUILD_CONFIGURATION --build-path $BUILD_DIR
+  if [ -e .swift-build-linux ]; then
+    echo Custom build command: `cat .swift-build-linux`
+    BUILD_CMD=$(cat .swift-build-linux)
+    eval "$BUILD_CMD --configuration $BUILD_CONFIGURATION --build-path $BUILD_DIR"
+  else
+    swift build --configuration $BUILD_CONFIGURATION --build-path $BUILD_DIR
+  fi
 }
 
 #----------------------------------------------------------
 function runTests {
   echo "Running tests..."
-  swift test
+  if [ -e .swift-test-linux ]; then
+    echo Custom test command: `cat .swift-test-linux`
+    BUILD_CMD=$(cat .swift-test-linux)
+    eval "$BUILD_CMD --build-path $BUILD_DIR"
+  else
+    swift test --build-path $BUILD_DIR
+  fi
 }
 
 #----------------------------------------------------------
@@ -84,9 +101,9 @@ fi
 
 # Invoke corresponding handler
 case $ACTION in
-"run")                 init && buildProject && run;;
+"run")                 init && run;;
 "build")               init && buildProject;;
-"debug")               init && buildProject && debugServer && run;;
+"debug")               init && debugServer && buildProject && run;;
 "test")                init && runTests;;
 *)                     help;;
 esac
