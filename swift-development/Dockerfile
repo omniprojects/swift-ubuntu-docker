@@ -33,7 +33,7 @@ ENV WORK_DIR /
 # Set WORKDIR
 WORKDIR ${WORK_DIR}
 
-# Setup system for node 8
+# Install Node
 RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 
 # Linux OS utils and libraries and set clang 3.8 as default
@@ -50,7 +50,7 @@ RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y \
   libcurl4-openssl-dev \
   vim \
   libgd-dev \
-  nodejs \
+  nodejs npm \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.8 100 \
@@ -58,11 +58,8 @@ RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y \
   && echo "set -o vi" >> /root/.bashrc
 
 
-# Install NodeJS
-RUN wget https://raw.githubusercontent.com/creationix/nvm/v0.16.1/install.sh \
-  && sh install.sh \
-  && source ~/.profile \
-  && nvm install 8.7.0
+# fucking debian installs `node` as `nodejs`
+RUN update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
 
 # Install Swift compiler
 RUN wget https://swift.org/builds/$SWIFT_SNAPSHOT_LOWERCASE/$UBUNTU_VERSION_NO_DOTS/$SWIFT_SNAPSHOT/$SWIFT_SNAPSHOT-$UBUNTU_VERSION.tar.gz \
