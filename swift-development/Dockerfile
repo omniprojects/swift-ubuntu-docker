@@ -57,6 +57,13 @@ RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y \
   && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.8 100 \
   && echo "set -o vi" >> /root/.bashrc
 
+
+# Install NodeJS
+RUN wget https://raw.githubusercontent.com/creationix/nvm/v0.16.1/install.sh \
+  && sh install.sh \
+  && source ~/.profile \
+  && nvm install 8.7.0
+
 # Install Swift compiler
 RUN wget https://swift.org/builds/$SWIFT_SNAPSHOT_LOWERCASE/$UBUNTU_VERSION_NO_DOTS/$SWIFT_SNAPSHOT/$SWIFT_SNAPSHOT-$UBUNTU_VERSION.tar.gz \
     https://swift.org/builds/$SWIFT_SNAPSHOT_LOWERCASE/$UBUNTU_VERSION_NO_DOTS/$SWIFT_SNAPSHOT/$SWIFT_SNAPSHOT-$UBUNTU_VERSION.tar.gz.sig \
