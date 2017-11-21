@@ -17,9 +17,7 @@
 # Dockerfile to build a Docker image with the Swift tools and binaries and
 # its dependencies.
 
-FROM ibmcom/ubuntu:16.04
-MAINTAINER IBM Swift Engineering at IBM Cloud
-LABEL Description="Linux Ubuntu 16.04 image with the Swift binaries and tools."
+FROM omniprojects/ubuntu:16.04
 
 USER root
 
@@ -32,9 +30,6 @@ ENV WORK_DIR /
 
 # Set WORKDIR
 WORKDIR ${WORK_DIR}
-
-# Install Node
-RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 
 # Linux OS utils and libraries and set clang 3.8 as default
 RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y \
