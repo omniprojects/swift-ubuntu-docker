@@ -46,6 +46,7 @@ RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y \
   vim \
   libgd-dev \
   nodejs npm \
+  libopencv-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.8 100 \
